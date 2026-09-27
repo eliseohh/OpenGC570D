@@ -79,13 +79,14 @@ Independent reproductions of the driver on other distributions:
 | --- | --- | --- | --- | --- |
 | CachyOS (Arch-based) | `7.2.2-1-cachyos` (clang-built) | clang 22.1.8 | disabled | `1461:0054`/`1461:5700` binds; HDMI IN 2 capture, both ALSA capture devices and the RGB LED verified |
 
-Build note for clang-built kernels: plain `make` selects GCC and fails against
-a clang-built kernel with clang-only flags (`-mstack-alignment=8`,
-`-mretpoline-external-thunk`, `-fexperimental-late-parse-attributes`, ...).
-Build the external module with the same toolchain as the kernel instead:
+Build note for clang-built kernels: these kernels pass clang-only flags
+(`-mstack-alignment=8`, `-mretpoline-external-thunk`, ...) that GCC rejects.
+The Makefile reads the target kernel's `include/config/auto.conf` and selects
+the LLVM toolchain automatically when `CONFIG_CC_IS_CLANG=y`, so plain `make`
+works; `make LLVM=1` still forces it explicitly:
 
 ```sh
-make LLVM=1 CC=clang
+make                 # auto-selects LLVM on clang-built kernels
 sudo ./scripts/gc570d-load.sh
 ```
 
